@@ -1,0 +1,17 @@
+function love.conf(t)
+    t.identity = nil                    -- The name of the save directory (string)
+    t.appendidentity = false            -- Search files in source directory before save directory (boolean)
+    t.version = "11.5"                  -- The LÖVE version this game was made for (string)
+
+    t.window.title = "PRO310-DPP"       -- The window title (string)
+    t.window.icon = nil                 -- Filepath to an image to use as the window's icon (string)
+    t.window.width = 960                -- The window width (number)
+    t.window.height = 720               -- The window height (number)
+    t.window.borderless = false         -- Remove all border visuals from the window (boolean)
+    t.window.resizable = false          -- Let the window be user-resizable (boolean)
+    t.window.minwidth = 1               -- Minimum window width if the window is resizable (number)
+    t.window.minheight = 1              -- Minimum window height if the window is resizable (number)
+    t.window.fullscreen = false         -- Enable fullscreen (boolean)
+    t.window.fullscreentype = "desktop" -- Choose between "desktop" fullscreen or "exclusive" fullscreen mode (string)
+    t.window.vsync = 1                  -- Vertical sync mode (number)
+end
