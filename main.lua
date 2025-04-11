@@ -7,6 +7,8 @@ local timer = 0
 local center = { x = 100, y = 100 }
 local memory_used
 
+Debug = require("src.debug")
+
 function love.load()
     center.x, center.y = love.graphics.getDimensions()
     center.x = center.x / 2
@@ -14,29 +16,26 @@ function love.load()
 
     love.graphics.setBackgroundColor(1, 1, 1)
 
-    local font = love.graphics.getFont()
-    memory_used = love.graphics.newText(font, "")
+    Debug.load()
+    require("src.input")
 end
 
 function love.update(dt)
     timer = timer + dt
+    Debug.update(dt)
 
     -- Garbage Collection (every 3 seconds)
     if timer % 3 < 0.1 then
         collectgarbage("collect")
-        memory_used:set('Memory usage: ' .. math.floor(collectgarbage('count')) .. ' kB')
         collectgarbage("stop")
     end
 end
 
 function love.draw()
     love.graphics.setColor(0, 0, 0)
-    love.graphics.rectangle("fill", 0, 0, center.x * 2, 35)
     love.graphics.circle('line', center.x + math.sin( timer ) * 20, center.y + math.cos( timer ) * 20, 20)
 
-    love.graphics.setColor(1, 1, 1)
-    love.graphics.print(tostring(love.timer.getFPS( )).." FPS", 20, 10)
-    love.graphics.draw(memory_used, center.x * 2 - 20 - memory_used:getWidth(), 10)
+    if Debug.shown then Debug.draw(center.x * 2) end
 end
 
 
