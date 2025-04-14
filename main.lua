@@ -4,15 +4,13 @@ end
 
 
 local timer = 0
-local center = { x = 100, y = 100 }
+local width, height
 local memory_used
 
 Debug = require("src.debug")
 
 function love.load()
-    center.x, center.y = love.graphics.getDimensions()
-    center.x = center.x / 2
-    center.y = center.y / 2
+    width, height = love.graphics.getDimensions()
 
     love.graphics.setBackgroundColor(1, 1, 1)
 
@@ -25,17 +23,14 @@ function love.update(dt)
     Debug.update(dt)
 
     -- Garbage Collection (every 3 seconds)
-    if timer % 3 < 0.1 then
-        collectgarbage("collect")
-        collectgarbage("stop")
-    end
+    if timer % 3 < 0.1 then collectgarbage("collect") end
 end
 
 function love.draw()
     love.graphics.setColor(0, 0, 0)
-    love.graphics.circle('line', center.x + math.sin( timer ) * 20, center.y + math.cos( timer ) * 20, 20)
+    love.graphics.circle('line', width * 0.5 + math.sin( timer ) * 20, height * 0.5 + math.cos( timer ) * 20, 20)
 
-    if Debug.shown then Debug.draw(center.x * 2) end
+    if Debug.shown then Debug.draw(width) end
 end
 
 

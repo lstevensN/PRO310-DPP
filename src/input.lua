@@ -9,3 +9,7 @@ function love.keypressed(key, scancode, isrepeat)
         love.event.quit()
     end
 end
+
+function love.mousepressed(x, y, button, istouch, presses)
+
+end
