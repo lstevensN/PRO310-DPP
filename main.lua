@@ -5,21 +5,21 @@ end
 
 local timer = 0
 local width, height
-local memory_used
 
-Debug = require("src.debug")
-
-local testHitbox = require("src.hitbox")
+local testHitbox
 
 function love.load()
     width, height = love.graphics.getDimensions()
 
     love.graphics.setBackgroundColor(1, 1, 1)
 
+    Debug = require("src.debug")
+    Hitbox = require("src.hitbox")
+
     Debug.load()
     require("src.input")
 
-    testHitbox:initialize( width/2, height/2, 50, 100 )
+    testHitbox = Hitbox:new( width/2, height/2, 50, 100 )
 end
 
 function love.update(dt)
