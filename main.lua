@@ -9,6 +9,8 @@ local memory_used
 
 Debug = require("src.debug")
 
+local testHitbox = require("src.hitbox")
+
 function love.load()
     width, height = love.graphics.getDimensions()
 
@@ -16,6 +18,8 @@ function love.load()
 
     Debug.load()
     require("src.input")
+
+    testHitbox:initialize( width/2, height/2, 50, 100 )
 end
 
 function love.update(dt)
@@ -31,6 +35,8 @@ function love.draw()
     love.graphics.circle('line', width * 0.5 + math.sin( timer ) * 20, height * 0.5 + math.cos( timer ) * 20, 20)
 
     if Debug.shown then Debug.draw(width) end
+
+    testHitbox:draw()
 end
 
 
