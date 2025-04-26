@@ -1,4 +1,5 @@
-local Hitbox = {}
+Hitbox = {}
+Hitbox.__index = Hitbox
 
 local function CreateHitboxMesh(w, h)
     local vertices = {
@@ -9,15 +10,6 @@ local function CreateHitboxMesh(w, h)
     }
 
     return love.graphics.newMesh( vertices, "fan", "static" )
-end
-
-local function InitializeHitbox(self, x, y, w, h, sx, sy)
-    self.x, self.y = x or 0, y or 0
-    self.width, self.height = w or 1, h or 1
-    self.rotation = 0
-    self.sx, self.sy = sx or 1, sy or 1
-
-    self.mesh = CreateHitboxMesh( self.width, self.height )
 end
 
 function Hitbox:update(dt)
@@ -33,11 +25,24 @@ function Hitbox:draw()
 end
 
 function Hitbox:new(x, y, w, h, sx, sy)
-    local newHitbox = Hitbox
+    local hitbox = {
+        x = x or 0,
+        y = y or 0,
 
-    InitializeHitbox( newHitbox, x, y, w, h, sx, sy )
+        width = w or 1,
+        height = h or 1,
 
-    return newHitbox
+        rotation = 0,
+
+        sx = sx or 1,
+        sy = sy or 1,
+
+        mesh = {}
+    }
+
+    hitbox.mesh = CreateHitboxMesh( hitbox.width, hitbox.height )
+
+    setmetatable(hitbox, self)
+
+    return hitbox
 end
-
-return Hitbox
