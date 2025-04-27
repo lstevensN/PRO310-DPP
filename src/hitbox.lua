@@ -21,7 +21,7 @@ function Hitbox:draw()
 
     love.graphics.draw( self.mesh, self.x, self.y, self.rotation, self.scaleX, self.scaleY )
 
-    love.graphics.setColor( 0, 0, 0, 1 )  -- Set color to White
+    love.graphics.setColor( 0, 0, 0, 1 )  -- Set color to Black
 end
 
 function Hitbox:new(x, y, w, h, sx, sy)
@@ -32,8 +32,8 @@ function Hitbox:new(x, y, w, h, sx, sy)
         width = w or 1,
         height = h or 1,
 
-        originX = w / 2,
-        originY = h / 2,
+        originX = 0.5,
+        originY = 0.5,
 
         rotation = 0,
 
@@ -43,9 +43,12 @@ function Hitbox:new(x, y, w, h, sx, sy)
         mesh = {}
     }
 
+    hitbox.originX = hitbox.width / 2
+    hitbox.originY = hitbox.height / 2
+
     hitbox.mesh = CreateHitboxMesh( hitbox.originX, hitbox.originY )
 
-    setmetatable(hitbox, self)
+    setmetatable( hitbox, self )
 
     return hitbox
 end
