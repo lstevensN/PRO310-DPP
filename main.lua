@@ -20,6 +20,7 @@ function love.load()
     require( "src.debug" )
     require( "src.hitbox" )
     require( "src.input" )
+    require( "src.map" )
     require( "src.player" )
 
     Debug:load()
