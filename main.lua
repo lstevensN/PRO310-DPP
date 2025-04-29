@@ -9,6 +9,7 @@ local width, height
 local testHitbox, testHitbox2
 
 local testCurve
+local finishTime = 5
 
 function love.load()
     width, height = love.graphics.getDimensions()
@@ -31,12 +32,19 @@ function love.load()
 
     testCurve = love.math.newBezierCurve( 100, 100, 100, 620, 860, 620 )
 
+    TestPlayer = Player:new()
+    TestPlayer:move( width/2, height/2 )
+
     -- collectgarbage( "stop" )
 end
 
 function love.update(dt)
     timer = timer + dt
     Debug:update( dt )
+
+    testHitbox:move( testCurve:evaluate( (timer % finishTime) / finishTime ) )
+
+    TestPlayer:update( dt )
 
     -- Garbage Collection (every 3 seconds)
     if timer % 3 < 0.1 then collectgarbage( "collect" ) end
@@ -51,6 +59,8 @@ function love.draw()
     testHitbox2:draw()
 
     love.graphics.line( testCurve:render() )
+
+    TestPlayer:draw()
 end
 
 

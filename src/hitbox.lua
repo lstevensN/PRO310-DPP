@@ -13,7 +13,11 @@ local function CreateHitboxMesh(ox, oy)
 end
 
 function Hitbox:update(dt)
+    if self.layer == "touch" then
 
+    elseif self.layer == "damage" then
+
+    end
 end
 
 function Hitbox:draw()
@@ -22,6 +26,8 @@ function Hitbox:draw()
     love.graphics.draw( self.mesh, self.x, self.y, self.rotation, self.scaleX, self.scaleY )
 
     love.graphics.setColor( 0, 0, 0, 1 )  -- Set color to Black
+
+    love.graphics.circle( "fill", self.x, self.y, 3 )
 end
 
 function Hitbox:move(x, y)
@@ -31,7 +37,10 @@ end
 
 function Hitbox:new(width, height, layer)
     local hitbox = {
-        layer = layer or "",
+    -- LAYERS
+    --- Touch: area with collision detection on touch
+    --- Damage: area that deals damage on touch
+        layer = layer or "touch",
 
         x = 0,
         y = 0,
