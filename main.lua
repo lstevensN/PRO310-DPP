@@ -15,6 +15,7 @@ function love.load()
 
     love.graphics.setBackgroundColor( 1, 1, 1 )
 
+    require( "src.animation" )
     require( "src.debug" )
     require( "src.hitbox" )
     require( "src.input" )
@@ -22,10 +23,13 @@ function love.load()
 
     Debug:load()
 
-    testHitbox = Hitbox:new( width/2, height/2, 50, 100 )
-    testHitbox2 = Hitbox:new( width/2 + 50, height/2 - 50, 100, 50 )
+    testHitbox = Hitbox:new( 50, 100 )
+    testHitbox:move( width/2, height/2 )
 
-    testCurve = love.math.newBezierCurve( 100, 200, 100, 100, 200, 100 )
+    testHitbox2 = Hitbox:new( 100, 50 )
+    testHitbox2:move( width/2 + 50, height/2 - 50 )
+
+    testCurve = love.math.newBezierCurve( 100, 100, 100, 620, 860, 620 )
 
     -- collectgarbage( "stop" )
 end

@@ -24,29 +24,33 @@ function Hitbox:draw()
     love.graphics.setColor( 0, 0, 0, 1 )  -- Set color to Black
 end
 
-function Hitbox:new(x, y, w, h, sx, sy)
+function Hitbox:move(x, y)
+    self.x = x
+    self.y = y
+end
+
+function Hitbox:new(width, height, layer)
     local hitbox = {
-        x = x or 0,
-        y = y or 0,
+        layer = layer or "",
 
-        width = w or 1,
-        height = h or 1,
+        x = 0,
+        y = 0,
 
-        originX = 0.5,
-        originY = 0.5,
+        width = width or 1,
+        height = height or 1,
 
         rotation = 0,
 
-        scaleX = sx or 1,
-        scaleY = sy or 1,
+        scale = { x = 1, y = 1 },
+
+        origin = {},
 
         mesh = {}
     }
 
-    hitbox.originX = hitbox.width / 2
-    hitbox.originY = hitbox.height / 2
+    hitbox.origin = { x = hitbox.width/2, y = hitbox.height/2 }
 
-    hitbox.mesh = CreateHitboxMesh( hitbox.originX, hitbox.originY )
+    hitbox.mesh = CreateHitboxMesh( hitbox.origin.x, hitbox.origin.y )
 
     setmetatable( hitbox, self )
 

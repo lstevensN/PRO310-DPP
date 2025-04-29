@@ -1,13 +1,24 @@
 Player = {}
 Player.__index = Player
 
-function Player:new(x, y, w, h)
-    local player = {
-        x = x or 0,
-        y = y or 0,
+local PLAYER_WIDTH = 100
+local PLAYER_HEIGHT = 200
 
-        width = w or 1,
-        height = h or 1
+function Player:new()
+    local player = {
+        x = 0,
+        y = 0,
+
+        width = PLAYER_WIDTH,
+        height = PLAYER_HEIGHT,
+
+        rotation = 0,
+
+        scale = { x = 1, y = 1 },
+
+        origin = { x = PLAYER_WIDTH/2, y = PLAYER_HEIGHT/2 },
+
+        animations = {}
     }
 
     setmetatable( player, self )
