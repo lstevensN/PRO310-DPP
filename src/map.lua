@@ -1,6 +1,14 @@
 Map = {}
 Map.__index = Map
 
+function Map:addHitbox(hitbox)
+    for _, h in ipairs(self.colliders) do
+        if h == hitbox then return end
+    end
+
+    table.insert( self.colliders, hitbox )
+end
+
 function Map:new(id)
     local map = {
     -- Map ID

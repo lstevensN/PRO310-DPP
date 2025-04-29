@@ -11,6 +11,8 @@ local testHitbox, testHitbox2
 local testCurve
 local finishTime = 5
 
+local testMap
+
 function love.load()
     width, height = love.graphics.getDimensions()
 
@@ -25,15 +27,20 @@ function love.load()
 
     Debug:load()
 
+    testMap = Map:new( 0 )
+    CurrentMap = testMap
+    
     testHitbox = Hitbox:new( 50, 100 )
+    testMap:addHitbox( testHitbox )
     testHitbox:move( width/2, height/2 )
 
     testHitbox2 = Hitbox:new( 100, 50 )
+    testMap:addHitbox( testHitbox2 )
     testHitbox2:move( width/2 + 50, height/2 - 50 )
 
     testCurve = love.math.newBezierCurve( 100, 100, 100, 620, 860, 620 )
 
-    TestPlayer = Player:new()
+    TestPlayer = Player:new( testMap )
     TestPlayer:move( width/2, height/2 )
 
     -- collectgarbage( "stop" )

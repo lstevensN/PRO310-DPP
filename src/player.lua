@@ -1,6 +1,7 @@
 Player = {}
 Player.__index = Player
 
+-- CONSTANTS
 local PLAYER_SPRITE_WIDTH = 100
 local PLAYER_SPRITE_HEIGHT = 200
 
@@ -8,6 +9,12 @@ local PLAYER_COLLISION_WIDTH = 100
 local PLAYER_COLLISION_HEIGHT = 200
 
 local PLAYER_DEFAULT_SPEED = 150
+
+
+function Player:move(x, y)
+    self.x = x - self.origin.x
+    self.y = y - self.origin.y
+end
 
 function Player:update(dt)
     -- Simple Player Controls
@@ -24,12 +31,7 @@ function Player:draw()
     if Debug.shown then self.hitbox:draw() end
 end
 
-function Player:move(x, y)
-    self.x = x - self.origin.x
-    self.y = y - self.origin.y
-end
-
-function Player:new()
+function Player:new(map)
     local player = {
     -- World Position
         x = 0, y = 0,
@@ -46,7 +48,7 @@ function Player:new()
     -- Visual Dimensions
         width = PLAYER_SPRITE_WIDTH, height = PLAYER_SPRITE_HEIGHT,
 
-    -- Sprite Origin  (needed for sprite flipping)
+    -- Sprite Origin  (center, needed for sprite flipping)
         origin = { x = PLAYER_SPRITE_WIDTH/2, y = PLAYER_SPRITE_HEIGHT/2 },
 
     -- Animation Frames
@@ -58,9 +60,17 @@ function Player:new()
     -- Current Visual Direction  (determines sprite flipping)
         direction = "left",
 
+    -- Current State
+        state = "idle",
+
     -- Primary Collision Hitbox
-        hitbox = Hitbox:new( PLAYER_COLLISION_WIDTH, PLAYER_COLLISION_HEIGHT )
+        hitbox = Hitbox:new( PLAYER_COLLISION_WIDTH, PLAYER_COLLISION_HEIGHT ),
+
+    -- Current Map
+        map = map or nil
     }
+
+    player.map:addHitbox( player.hitbox )
 
     setmetatable( player, self )
     return player

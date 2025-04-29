@@ -21,7 +21,9 @@ function Hitbox:update(dt)
 end
 
 function Hitbox:draw()
-    love.graphics.setColor( 20/255, 200/255, 30/255, 0.4 )  -- Set color to Green
+    if #self.collisions > 0 then love.graphics.setColor( 1, 0, 0, 0.4 )  -- Set color to Red
+    else love.graphics.setColor( 20/255, 200/255, 30/255, 0.4 )  -- Set color to Green
+    end
 
     love.graphics.draw( self.mesh, self.x, self.y, self.rotation, self.scaleX, self.scaleY )
 
@@ -37,24 +39,31 @@ end
 
 function Hitbox:new(width, height, layer)
     local hitbox = {
-    -- LAYERS
-    --- Touch: area with collision detection on touch
-    --- Damage: area that deals damage on touch
+    -- Collision Layer
+    --- "touch": area with collision detection on touch
+    --- "damage": area that deals damage on touch
         layer = layer or "touch",
 
-        x = 0,
-        y = 0,
+    -- Global Position
+        x = 0, y = 0,
 
-        width = width or 1,
-        height = height or 1,
-
+    -- Global Rotation
         rotation = 0,
-
+    
+    -- Global Scale
         scale = { x = 1, y = 1 },
 
+    -- Box Dimensions
+        width = width or 1, height = height or 1,
+
+    -- Box Origin  (center)
         origin = {},
 
-        mesh = {}
+    -- Box Mesh
+        mesh = {},
+
+    -- Current Collisions
+        collisions = {}
     }
 
     hitbox.origin = { x = hitbox.width/2, y = hitbox.height/2 }
