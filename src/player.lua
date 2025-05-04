@@ -10,25 +10,49 @@ local PLAYER_COLLISION_HEIGHT = 200
 
 local PLAYER_DEFAULT_SPEED = 150
 
+function Player:rotate(rotate)
+    self.rotation = self.rotation + rotate
 
-function Player:move(x, y)
-    self.x = x - self.origin.x
-    self.y = y - self.origin.y
+    self.hitbox:rotate( rotate )
+end
+
+function Player:move(xDistance, yDistance)
+    self.x = self.x + xDistance
+    self.y = self.y + yDistance
+
+    self.hitbox:move( xDistance, yDistance )
 end
 
 function Player:update(dt)
     -- Simple Player Controls
-    if love.keyboard.isDown( "a" ) then self.x = self.x - self.speed * dt
-    elseif love.keyboard.isDown( "d" ) then self.x = self.x + self.speed * dt end
+    if love.keyboard.isDown( "a" ) then
+        self:move( -self.speed * dt, 0 )
+    end
 
-    self.hitbox:move( self.x, self.y )
+    if love.keyboard.isDown( "d" ) then
+        self:move( self.speed * dt, 0 )
+    end
+
+    if love.keyboard.isDown( "w" ) then
+        self:move( 0, -self.speed * dt )
+    end
+
+    if love.keyboard.isDown( "s" ) then
+        self:move( 0, self.speed * dt )
+    end
+
+    if (love.keyboard.isDown( "q" )) then
+        self:rotate( -math.pi/2 * dt )
+    end
+
+    if (love.keyboard.isDown( "e" )) then
+        self:rotate( math.pi/2 * dt )
+    end
 end
 
 function Player:draw()
     -- Draw Player Sprite(s)
     love.graphics.circle( "fill", self.x, self.y, 3 )
-
-    if Debug.shown then self.hitbox:draw() end
 end
 
 function Player:new(map)
@@ -70,6 +94,7 @@ function Player:new(map)
         map = map or nil
     }
 
+    player.hitbox:move( player.x, player.y )
     player.map:addHitbox( player.hitbox )
 
     setmetatable( player, self )

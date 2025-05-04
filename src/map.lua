@@ -9,12 +9,22 @@ function Map:addHitbox(hitbox)
     table.insert( self.colliders, hitbox )
 end
 
+function Map:update(dt)
+    for _, hitbox1 in ipairs( self.colliders ) do
+        for _, hitbox2 in ipairs( self.colliders ) do
+            if (hitbox1 ~= hitbox2) then
+                hitbox1:CheckCollision( hitbox2 )
+            end
+        end
+    end
+end
+
 function Map:new(id)
     local map = {
     -- Map ID
         id = id or -1,
 
-    -- Colliders in Scene
+    -- Colliders/Hitboxes in Scene
         colliders = {}
     }
 

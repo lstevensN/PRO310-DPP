@@ -22,4 +22,6 @@ function Debug:draw(width)
     love.graphics.print( tostring( love.timer.getFPS( ) ).." FPS", 20, 10 )
     love.graphics.draw( hitboxes, width/2 - hitboxes:getWidth()/2, 10 )
     love.graphics.draw( memory_used, width - 20 - memory_used:getWidth(), 10 )
+
+    love.graphics.setColor( 0, 0, 0 )
 end

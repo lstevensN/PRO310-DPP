@@ -10,6 +10,7 @@ local testHitbox, testHitbox2
 
 local testCurve
 local finishTime = 5
+local movingHitboxDistanceX, movingHitboxDistanceY
 
 local testMap
 
@@ -23,6 +24,7 @@ function love.load()
     require( "src.hitbox" )
     require( "src.input" )
     require( "src.map" )
+    require( "src.math" )
     require( "src.player" )
 
     Debug:load()
@@ -30,9 +32,9 @@ function love.load()
     testMap = Map:new( 0 )
     CurrentMap = testMap
     
-    testHitbox = Hitbox:new( 50, 100 )
-    testMap:addHitbox( testHitbox )
-    testHitbox:move( width/2, height/2 )
+    --testHitbox = Hitbox:new( 50, 100 )
+    --testMap:addHitbox( testHitbox )
+    --testHitbox:move( 100, 100 )
 
     testHitbox2 = Hitbox:new( 100, 50 )
     testMap:addHitbox( testHitbox2 )
@@ -41,7 +43,8 @@ function love.load()
     testCurve = love.math.newBezierCurve( 100, 100, 100, 620, 860, 620 )
 
     TestPlayer = Player:new( testMap )
-    TestPlayer:move( width/2, height/2 )
+    -- TestPlayer:rotate( math.pi * 1.27 )
+    TestPlayer:move( 650, 280 )
 
     -- collectgarbage( "stop" )
 end
@@ -50,9 +53,17 @@ function love.update(dt)
     timer = timer + dt
     Debug:update( dt )
 
-    testHitbox:move( testCurve:evaluate( (timer % finishTime) / finishTime ) )
+    --movingHitboxDistanceX, movingHitboxDistanceY = testCurve:evaluate( (timer % finishTime) / finishTime )
+    --movingHitboxDistanceX = movingHitboxDistanceX - testHitbox.x
+    --movingHitboxDistanceY = movingHitboxDistanceY - testHitbox.y
+
+    --testHitbox:move( movingHitboxDistanceX, movingHitboxDistanceY )
+
+    local test = testHitbox2:getCorners()
 
     TestPlayer:update( dt )
+
+    testMap:update( dt )
 
     -- Garbage Collection (every 3 seconds)
     if timer % 3 < 0.1 then collectgarbage( "collect" ) end
@@ -61,14 +72,15 @@ end
 function love.draw()
     love.graphics.setColor( 0, 0, 0 )
 
-    if Debug.shown then Debug:draw( width ) end
-
-    testHitbox:draw()
-    testHitbox2:draw()
+    if Debug.shown then
+        for _, h in ipairs( testMap.colliders ) do h:draw() end
+    end
 
     love.graphics.line( testCurve:render() )
 
     TestPlayer:draw()
+
+    Debug:draw( width )
 end
 
 
