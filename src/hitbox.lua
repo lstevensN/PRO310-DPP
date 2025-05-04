@@ -15,73 +15,38 @@ local function CreateHitboxMesh(ox, oy)
 end
 
 local function IsProjectionCollide(h1, h2)
-    local lines = h2:getAxis()
-    local corners = h1:getCorners()
+    local axes1 = h1:getAxes()
 
-    local isCollide = true
+    for _, axis in ipairs( axes1 ) do
+        local p1 = h1:Project( axis )
+        local p2 = h2:Project( axis )
 
-    for dimension, line in ipairs( lines ) do
-        local futhers = { min = nil, max = nil }
-
-        local h2BoxHalfSize
-        if (dimension == 1) then
-            h2BoxHalfSize = h2.origin.x
-        else
-            h2BoxHalfSize = h2.origin.y
-        end
-
-        for _, corner in ipairs(corners) do
-            local projected = VectorProject( corner, line )
-            local CP = SubtractVectors( projected, { x = h2.x, y = h2.y } )
-
-            local sign = (CP.x * line.direction.x) + (CP.y * line.direction.y) > 0
-            local signedDistance = VectorMagnitude( CP )
-            if (sign == false) then signedDistance = signedDistance * -1 end
-        
-            if (not futhers.min or futhers.min.signedDistance > signedDistance) then
-                futhers.min = { signedDistance = signedDistance, corner = corner, projected = projected }
-            end
-
-            if (not futhers.max or futhers.max.signedDistance < signedDistance) then
-                futhers.max = { signedDistance = signedDistance, corner = corner, projected = projected }
-            end
-
-            local absMinSignedDistance = math.abs( futhers.min.signedDistance )
-            local absMaxSignedDistance = math.abs( futhers.max.signedDistance )
-
-            local projectionColide = ((futhers.min.signedDistance < 0 and futhers.max.signedDistance > 0 or
-                absMinSignedDistance < h2BoxHalfSize or absMaxSignedDistance < h2BoxHalfSize))
-
-            if (projectionColide == false) then isCollide = projectionColide end
-            
-
-            table.insert( drawQueue, function ()
-                love.graphics.setColor( 0, 0, 0, 1 )
-                love.graphics.circle( "fill", corner.x, corner.y, 2 )
-
-                love.graphics.setColor( 0, 0, 1, 0.05 )
-
-                love.graphics.circle( "fill", futhers.min.projected.x, futhers.min.projected.y, 2 )
-                love.graphics.line( futhers.min.corner.x, futhers.min.corner.y, futhers.min.projected.x, futhers.min.projected.y )
-                
-                love.graphics.circle( "fill", futhers.max.projected.x, futhers.max.projected.y, 2 )
-                love.graphics.line( futhers.max.corner.x, futhers.max.corner.y, futhers.max.projected.x, futhers.max.projected.y )
-
-                if (projectionColide == true) then love.graphics.setColor( 1, 0, 0, 1 ) end
-                love.graphics.line( futhers.min.projected.x, futhers.min.projected.y, futhers.max.projected.x, futhers.max.projected.y )
-
-                if (dimension == 1) then love.graphics.setColor( 1, 0, 1, 0.1 ) else love.graphics.setColor( 1, 140/255, 0, 0.1 ) end
-                love.graphics.line( line.origin.x, line.origin.y, h2.x + line.direction.x * 500, h2.y + line.direction.y * 500 )
-            end )
-        end
+        if (not (p1.min < p2.min and p2.min < p1.max) and
+            not (p2.min < p1.min and p1.min < p2.max)) then return false end
     end
 
-    return isCollide
+    return true
 end
 
-function Hitbox:getAxis()
+function Hitbox:Project( axis )
+    local vertices = self:getVertices()
+
+    local min = VectorDotAxis( vertices[1], axis )
+    local max = min
+
+    for _, vertex in ipairs( vertices ) do
+        local p = VectorDotAxis( vertex, axis )
+
+        if (p < min) then min = p
+        elseif (p > max) then max = p end
+    end
+
+    return { min = min, max = max }
+end
+
+function Hitbox:getAxes()
     local OX = { x = 1, y = 0 }
-    local OY = { x = 0, y = -1 }
+    local OY = { x = 0, y = 1 }
     local RX = VectorRotate( OX, self.rotation )
     local RY = VectorRotate( OY, self.rotation )
 
@@ -97,11 +62,11 @@ function Hitbox:getAxis()
     }
 end
 
-function Hitbox:getCorners()
+function Hitbox:getVertices()
     local C1 = { x =  self.origin.x, y =  self.origin.y }
-    local C2 = { x = -self.origin.x, y =  self.origin.y }
+    local C2 = { x =  self.origin.x, y = -self.origin.y }
     local C3 = { x = -self.origin.x, y = -self.origin.y }
-    local C4 = { x =  self.origin.x, y = -self.origin.y }
+    local C4 = { x = -self.origin.x, y =  self.origin.y }
 
     C1 = VectorRotate( C1, self.rotation )
     C2 = VectorRotate( C2, self.rotation )
@@ -117,7 +82,7 @@ function Hitbox:getCorners()
 end
 
 function Hitbox:CheckCollision(other)
-    if (IsProjectionCollide( self, other )) then
+    if (IsProjectionCollide( self, other ) and IsProjectionCollide( other, self )) then
         local alreadyRegistered = false
 
         for _, v in ipairs( self.collisions ) do

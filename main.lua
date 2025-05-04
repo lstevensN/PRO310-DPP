@@ -44,7 +44,7 @@ function love.load()
 
     TestPlayer = Player:new( testMap )
     -- TestPlayer:rotate( math.pi * 1.27 )
-    TestPlayer:move( 650, 280 )
+    TestPlayer:move( width/2, height/2 )
 
     -- collectgarbage( "stop" )
 end
@@ -58,8 +58,6 @@ function love.update(dt)
     --movingHitboxDistanceY = movingHitboxDistanceY - testHitbox.y
 
     --testHitbox:move( movingHitboxDistanceX, movingHitboxDistanceY )
-
-    local test = testHitbox2:getCorners()
 
     TestPlayer:update( dt )
 

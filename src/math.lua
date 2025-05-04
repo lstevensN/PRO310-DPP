@@ -42,18 +42,13 @@ end
 
 function VectorRotate(v, r)
     return {
-        x = v.x * math.cos(r) + v.y * math.sin(r),
-        y = v.x * math.sin(r) - v.y * math.cos(r)
+        x = v.x * math.cos(r) - v.y * math.sin(r),
+        y = v.x * math.sin(r) + v.y * math.cos(r)
     }
 end
 
-function VectorProject(v, line)
-    local dotValue = line.direction.x * (v.x - line.origin.x) + line.direction.y * (v.y - line.origin.y)
-
-    return {
-        x = line.origin.x + line.direction.x * dotValue,
-        y = line.origin.y + line.direction.y * dotValue
-    }
+function VectorDotAxis(v, axis)
+    return axis.direction.x * (v.x - axis.origin.x) + axis.direction.y * (v.y - axis.origin.y)
 end
 
 function VectorMagnitude(v)
