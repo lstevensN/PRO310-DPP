@@ -6,11 +6,11 @@ end
 local timer = 0
 local width, height
 
-local testHitbox, testHitbox2
+local solidBox, hurtBox
 
 local testCurve
 local finishTime = 5
-local movingHitboxDistanceX, movingHitboxDistanceY
+local hurtBoxDistanceX, hurtBoxDistanceY
 
 local testMap
 
@@ -31,19 +31,18 @@ function love.load()
 
     testMap = Map:new( 0 )
     CurrentMap = testMap
-    
-    --testHitbox = Hitbox:new( 50, 100 )
-    --testMap:addHitbox( testHitbox )
-    --testHitbox:move( 100, 100 )
 
-    testHitbox2 = Hitbox:new( 100, 50 )
-    testMap:addHitbox( testHitbox2 )
-    testHitbox2:move( width/2 + 50, height/2 - 50 )
+    solidBox = Hitbox:new( 100, 50, "solid" )
+    testMap:addHitbox( solidBox )
+    solidBox:move( width/2 + 200, height/2 )
+
+    hurtBox = Hitbox:new( 50, 100, "hurt" )
+    testMap:addHitbox( hurtBox )
+    hurtBox:move( 100, 100 )
 
     testCurve = love.math.newBezierCurve( 100, 100, 100, 620, 860, 620 )
 
     TestPlayer = Player:new( testMap )
-    -- TestPlayer:rotate( math.pi * 1.27 )
     TestPlayer:move( width/2, height/2 )
 
     -- collectgarbage( "stop" )
@@ -53,11 +52,11 @@ function love.update(dt)
     timer = timer + dt
     Debug:update( dt )
 
-    --movingHitboxDistanceX, movingHitboxDistanceY = testCurve:evaluate( (timer % finishTime) / finishTime )
-    --movingHitboxDistanceX = movingHitboxDistanceX - testHitbox.x
-    --movingHitboxDistanceY = movingHitboxDistanceY - testHitbox.y
+    hurtBoxDistanceX, hurtBoxDistanceY = testCurve:evaluate( (timer % finishTime) / finishTime )
+    hurtBoxDistanceX = hurtBoxDistanceX - hurtBox.x
+    hurtBoxDistanceY = hurtBoxDistanceY - hurtBox.y
 
-    --testHitbox:move( movingHitboxDistanceX, movingHitboxDistanceY )
+    hurtBox:move( hurtBoxDistanceX, hurtBoxDistanceY )
 
     TestPlayer:update( dt )
 

@@ -63,22 +63,18 @@ function Hitbox:getAxes()
 end
 
 function Hitbox:getVertices()
-    local C1 = { x =  self.origin.x, y =  self.origin.y }
-    local C2 = { x =  self.origin.x, y = -self.origin.y }
-    local C3 = { x = -self.origin.x, y = -self.origin.y }
-    local C4 = { x = -self.origin.x, y =  self.origin.y }
+    local vertices = {}
 
-    C1 = VectorRotate( C1, self.rotation )
-    C2 = VectorRotate( C2, self.rotation )
-    C3 = VectorRotate( C3, self.rotation )
-    C4 = VectorRotate( C4, self.rotation )
+    for i = 1, 4 do
+        local x, y = self.mesh:getVertex( i )
 
-    C1 = AddVectors( C1, { x = self.x, y = self.y } )
-    C2 = AddVectors( C2, { x = self.x, y = self.y } )
-    C3 = AddVectors( C3, { x = self.x, y = self.y } )
-    C4 = AddVectors( C4, { x = self.x, y = self.y } )
+        local vertex = VectorRotate( { x = x, y = y }, self.rotation )
+        vertex = AddVectors( vertex, { x = self.x, y = self.y } )
 
-    return { C1, C2, C3, C4 }
+        table.insert( vertices, vertex )
+    end
+
+    return vertices
 end
 
 function Hitbox:CheckCollision(other)
@@ -134,7 +130,8 @@ function Hitbox:new(width, height, layer)
     local hitbox = {
     -- Collision Layer
     --- "touch": area with collision detection on touch
-    --- "damage": area that deals damage on touch
+    --- "solid": area that applies resistance on touch (immobile)
+    --- "hurt": area that deals damage on touch
         layer = layer or "touch",
 
     -- Global Position
