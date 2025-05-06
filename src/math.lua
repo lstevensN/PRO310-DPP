@@ -47,10 +47,29 @@ function VectorRotate(v, r)
     }
 end
 
+function VectorDot(v1, v2)
+    return v1.x * v2.x + v1.y * v2.y
+end
+
 function VectorDotAxis(v, axis)
     return axis.direction.x * (v.x - axis.origin.x) + axis.direction.y * (v.y - axis.origin.y)
 end
 
 function VectorMagnitude(v)
     return math.sqrt( v.x * v.x + v.y * v.y )
+end
+
+function VectorNegate(v)
+    return {
+        x = v.x * -1,
+        y = v.y * -1
+    }
+end
+
+function VectorNormalize(v)
+    local magnitude = VectorMagnitude( v )
+    return {
+        x = v.x / magnitude,
+        y = v.y / magnitude
+    }
 end

@@ -15,20 +15,91 @@ local function CreateHitboxMesh(ox, oy)
 end
 
 local function IsProjectionCollide(h1, h2)
+    -- THANK YOU https://dyn4j.org/2010/01/sat/ SO MUCH FOR THE HELP AAAAAAAAA
+    -- I LOVE YOU <3
+
+    local overlap = 5000  -- Set to really big number by default
+    local smallestAxis
+
+    -- Get the axes of both hitboxes
     local axes1 = h1:getAxes()
+    local axes2 = h2:getAxes()
 
+    -- Check hitbox #1's axes
     for _, axis in ipairs( axes1 ) do
-        local p1 = h1:Project( axis )
-        local p2 = h2:Project( axis )
+        -- Project both hitboxes onto the axis
+        local p1 = h1:project( axis )
+        local p2 = h2:project( axis )
 
-        if (not (p1.min < p2.min and p2.min < p1.max) and
-            not (p2.min < p1.min and p1.min < p2.max)) then return false end
+        -- Check if projections overlap
+        if (not (p1.min < p2.min and p2.min < p1.max) and not (p2.min < p1.min and p1.min < p2.max)) then
+            return false -- Hitboxes are certainly NOT colliding, so we can confidently (and safely) return
+        else
+            local o = p1.getOverlap( p2 )
+
+            -- Check if either projection contains the other
+            if ((p1.min < p2.min and p2.max < p1.max) or (p2.min < p1.min and p1.max < p2.max)) then
+                local mins = math.abs( p1.min - p2.min )
+                local maxs = math.abs( p1.max - p2.max )
+
+                if (mins < maxs) then
+                    o = o + mins
+                else
+                    o = o + maxs
+                end
+            end
+
+            -- Ensure we have the smallest axis
+            if (o < overlap) then
+                overlap = o
+                smallestAxis = axis
+            end
+        end
     end
 
-    return true
+    -- Check hitbox #2's axes
+    for _, axis in ipairs( axes2 ) do
+        -- Project both hitboxes onto the axis
+        local p1 = h1:project( axis )
+        local p2 = h2:project( axis )
+
+        -- Check if projections overlap
+        if (not (p1.min < p2.min and p2.min < p1.max) and not (p2.min < p1.min and p1.min < p2.max)) then
+            return false -- Hitboxes are certainly NOT colliding, so we can confidently (and safely) return
+        else
+            local o = p1.getOverlap( p2 )
+
+            -- Check if either projection contains the other
+            if ((p1.min < p2.min and p2.max < p1.max) or (p2.min < p1.min and p1.max < p2.max)) then
+                local mins = math.abs( p1.min - p2.min )
+                local maxs = math.abs( p1.max - p2.max )
+
+                if (mins < maxs) then
+                    o = o + mins
+                else
+                    o = o + maxs
+                end
+            end
+
+            -- Ensure we have the smallest axis
+            if (o < overlap) then
+                overlap = o
+                smallestAxis = axis
+            end
+        end
+    end
+
+    local centerToCenter = SubtractVectors( { x = h1.x, y = h1.y }, { x = h2.x, y = h2.y } )
+    centerToCenter = VectorNormalize( centerToCenter )
+
+    if (h1.x < h2.x) then smallestAxis.direction.x = centerToCenter.x end
+    if (h1.y < h2.y) then smallestAxis.direction.y = centerToCenter.y end
+
+    -- Returns result of collision test & Minimum Translation Value (MTV) data
+    return true, { overlap = overlap, axis = smallestAxis }
 end
 
-function Hitbox:Project( axis )
+function Hitbox:project( axis )
     local vertices = self:getVertices()
 
     local min = VectorDotAxis( vertices[1], axis )
@@ -41,7 +112,12 @@ function Hitbox:Project( axis )
         elseif (p > max) then max = p end
     end
 
-    return { min = min, max = max }
+    return { min = min, max = max, getOverlap = function (other)
+        if (min < other.min and other.max < max) then return other.max - other.min
+        elseif (min < other.min and other.max > max) then return max - other.min
+        elseif (other.min < min and max > other.max) then return other.max - min
+        else return max - min end
+    end }
 end
 
 function Hitbox:getAxes()
@@ -68,7 +144,7 @@ function Hitbox:getVertices()
     for i = 1, 4 do
         local x, y = self.mesh:getVertex( i )
 
-        local vertex = VectorRotate( { x = x, y = y }, self.rotation )
+        local vertex = VectorRotate( { x = x * self.scale.x, y = y * self.scale.x }, self.rotation )
         vertex = AddVectors( vertex, { x = self.x, y = self.y } )
 
         table.insert( vertices, vertex )
@@ -77,17 +153,25 @@ function Hitbox:getVertices()
     return vertices
 end
 
-function Hitbox:CheckCollision(other)
-    if (IsProjectionCollide( self, other ) and IsProjectionCollide( other, self )) then
+function Hitbox:checkCollision(other)
+    -- Check if hitboxes are colliding
+    local colliding, mtv = IsProjectionCollide( self, other )
+
+    if (colliding) then
+        if (other.layer == "solid" and self.parent ~= nil and mtv ~= nil) then
+            local adjustment = VectorMultiply( mtv.axis.direction, mtv.overlap )
+            self.parent:move( adjustment.x, adjustment.y )
+        end
+
+
+        -- Check if other hitbox is already in "collisions" list
         local alreadyRegistered = false
 
         for _, v in ipairs( self.collisions ) do
-            if v == other then
-                alreadyRegistered = true
-                break
-            end
+            if v == other then alreadyRegistered = true break end
         end
 
+        -- If not, add it
         if (not alreadyRegistered) then table.insert( self.collisions, other ) end
     else
         for i, v in ipairs( self.collisions ) do
@@ -126,11 +210,12 @@ function Hitbox:move(xDistance, yDistance)
     self.y = self.y + yDistance
 end
 
-function Hitbox:new(width, height, layer)
+--> Constructor
+function Hitbox:new(width, height, layer, parent)
     local hitbox = {
     -- Collision Layer
     --- "touch": area with collision detection on touch
-    --- "solid": area that applies resistance on touch (immobile)
+    --- "solid": area that applies resistance on touch (immobile object)
     --- "hurt": area that deals damage on touch
         layer = layer or "touch",
 
@@ -153,7 +238,10 @@ function Hitbox:new(width, height, layer)
         mesh = {},
 
     -- Current Collisions
-        collisions = {}
+        collisions = {},
+
+    -- Parent/Owner
+        parent = parent or nil
     }
 
     hitbox.origin = { x = hitbox.width/2, y = hitbox.height/2 }

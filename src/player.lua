@@ -55,6 +55,7 @@ function Player:draw()
     love.graphics.circle( "fill", self.x, self.y, 3 )
 end
 
+--> Constructor
 function Player:new(map)
     local player = {
     -- World Position
@@ -88,12 +89,13 @@ function Player:new(map)
         state = "idle",
 
     -- Primary Collision Hitbox
-        hitbox = Hitbox:new( PLAYER_COLLISION_WIDTH, PLAYER_COLLISION_HEIGHT ),
+        hitbox = nil,
 
     -- Current Map
         map = map or nil
     }
 
+    player.hitbox = Hitbox:new( PLAYER_COLLISION_WIDTH, PLAYER_COLLISION_HEIGHT, "touch", player )
     player.hitbox:move( player.x, player.y )
     player.map:addHitbox( player.hitbox )
 
