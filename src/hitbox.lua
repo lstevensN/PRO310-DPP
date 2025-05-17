@@ -89,11 +89,10 @@ local function IsProjectionCollide(h1, h2)
         end
     end
 
-    local centerToCenter = SubtractVectors( { x = h1.x, y = h1.y }, { x = h2.x, y = h2.y } )
-    centerToCenter = VectorNormalize( centerToCenter )
-
-    if (h1.x < h2.x) then smallestAxis.direction.x = centerToCenter.x end
-    if (h1.y < h2.y) then smallestAxis.direction.y = centerToCenter.y end
+    -- Could use some tweaking, but I'll take it for now! :D
+    H1toH2 = { x = h1.x - h2.x, y = h1.y - h2.y }
+    if ((smallestAxis.direction.x < 0 and H1toH2.x > 0) or (smallestAxis.direction.x > 0 and H1toH2.x < 0)) then smallestAxis.direction.x = -smallestAxis.direction.x end
+    if ((smallestAxis.direction.y < 0 and H1toH2.y > 0) or (smallestAxis.direction.y > 0 and H1toH2.y < 0)) then smallestAxis.direction.y = -smallestAxis.direction.y end
 
     -- Returns result of collision test & Minimum Translation Value (MTV) data
     return true, { overlap = overlap, axis = smallestAxis }
@@ -112,12 +111,7 @@ function Hitbox:project( axis )
         elseif (p > max) then max = p end
     end
 
-    return { min = min, max = max, getOverlap = function (other)
-        if (min < other.min and other.max < max) then return other.max - other.min
-        elseif (min < other.min and other.max > max) then return max - other.min
-        elseif (other.min < min and max > other.max) then return other.max - min
-        else return max - min end
-    end }
+    return { min = min, max = max, getOverlap = function (other) return math.min( max, other.max ) - math.max( min, other.min ) end }
 end
 
 function Hitbox:getAxes()
@@ -162,7 +156,6 @@ function Hitbox:checkCollision(other)
             local adjustment = VectorMultiply( mtv.axis.direction, mtv.overlap )
             self.parent:move( adjustment.x, adjustment.y )
         end
-
 
         -- Check if other hitbox is already in "collisions" list
         local alreadyRegistered = false

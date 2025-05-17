@@ -34,6 +34,7 @@ function love.load()
 
     solidBox = Hitbox:new( 100, 50, "solid" )
     testMap:addHitbox( solidBox )
+    --solidBox:rotate( math.pi/3 )
     solidBox:move( width/2 + 200, height/2 )
 
     hurtBox = Hitbox:new( 50, 100, "hurt" )

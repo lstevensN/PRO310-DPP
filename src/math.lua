@@ -42,8 +42,8 @@ end
 
 function VectorRotate(v, r)
     return {
-        x = v.x * math.cos(r) - v.y * math.sin(r),
-        y = v.x * math.sin(r) + v.y * math.cos(r)
+        x = v.x * math.cos(r) + v.y * math.sin(r),
+        y = v.x * math.sin(r) - v.y * math.cos(r)
     }
 end
 
