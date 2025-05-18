@@ -12,7 +12,7 @@ end
 function Map:update(dt)
     for _, hitbox1 in ipairs( self.colliders ) do
         for _, hitbox2 in ipairs( self.colliders ) do
-            if (hitbox1 ~= hitbox2) then
+            if (hitbox1 ~= hitbox2 and hitbox1.parent ~= hitbox2.parent) then
                 hitbox1:checkCollision( hitbox2 )
             end
         end
@@ -26,7 +26,10 @@ function Map:new(id)
         id = id or -1,
 
     -- Colliders/Hitboxes in Scene
-        colliders = {}
+        colliders = {},
+
+    -- Gravity Value
+        gravity = -9
     }
 
     setmetatable( map, self )

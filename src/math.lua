@@ -42,8 +42,15 @@ end
 
 function VectorRotate(v, r)
     return {
-        x = v.x * math.cos(r) + v.y * math.sin(r),
-        y = v.x * math.sin(r) - v.y * math.cos(r)
+        x = v.x * math.cos( r ) - v.y * math.sin( r ),
+        y = v.x * math.sin( r ) + v.y * math.cos( r )
+    }
+end
+
+function VectorRotateAroundPoint(v, r, dx, dy)
+    return {
+        x = ((v.x - dx) * math.cos( r ) - (v.y - dy) * math.sin( r )) + dx,
+        y = ((v.x - dx) * math.sin( r ) + (v.y - dy) * math.cos( r )) + dy
     }
 end
 

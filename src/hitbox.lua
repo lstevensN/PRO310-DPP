@@ -152,7 +152,7 @@ function Hitbox:checkCollision(other)
     local colliding, mtv = IsProjectionCollide( self, other )
 
     if (colliding) then
-        if (other.layer == "solid" and self.parent ~= nil and mtv ~= nil) then
+        if (self.layer == "rigid" and (other.layer == "rigid" or other.layer == "solid") and self.parent ~= nil and mtv ~= nil) then
             local adjustment = VectorMultiply( mtv.axis.direction, mtv.overlap )
             self.parent:move( adjustment.x, adjustment.y )
         end
@@ -194,8 +194,14 @@ function Hitbox:draw()
     love.graphics.circle( "fill", self.x, self.y, 3 )
 end
 
-function Hitbox:rotate(rotate)
+function Hitbox:rotate(rotate, x, y)
     self.rotation = self.rotation + rotate
+
+    if (x ~= nil and y ~= nil) then
+        local newPos = VectorRotateAroundPoint( { x = self.x, y = self.y }, rotate, x, y )
+        self.x = newPos.x
+        self.y = newPos.y
+    end
 end
 
 function Hitbox:move(xDistance, yDistance)
@@ -208,7 +214,8 @@ function Hitbox:new(width, height, layer, parent)
     local hitbox = {
     -- Collision Layer
     --- "touch": area with collision detection on touch
-    --- "solid": area that applies resistance on touch (immobile object)
+    --- "rigid": area that applies resistance on touch
+    --- "solid": area that acts as an immobile object
     --- "hurt": area that deals damage on touch
         layer = layer or "touch",
 
@@ -242,6 +249,11 @@ function Hitbox:new(width, height, layer, parent)
     hitbox.mesh = CreateHitboxMesh( hitbox.origin.x, hitbox.origin.y )
 
     setmetatable( hitbox, self )
+
+    if (hitbox.parent ~= nil) then
+        hitbox.parent.map:addHitbox( hitbox )
+        hitbox:move( hitbox.parent.x, hitbox.parent.y )
+    end
 
     return hitbox
 end

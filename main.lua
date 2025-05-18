@@ -6,11 +6,7 @@ end
 local timer = 0
 local width, height
 
-local solidBox, hurtBox
-
-local testCurve
-local finishTime = 5
-local hurtBoxDistanceX, hurtBoxDistanceY
+local ground
 
 local testMap
 
@@ -32,19 +28,12 @@ function love.load()
     testMap = Map:new( 0 )
     CurrentMap = testMap
 
-    solidBox = Hitbox:new( 100, 50, "solid" )
-    testMap:addHitbox( solidBox )
-    --solidBox:rotate( math.pi/3 )
-    solidBox:move( width/2 + 200, height/2 )
-
-    hurtBox = Hitbox:new( 50, 100, "hurt" )
-    testMap:addHitbox( hurtBox )
-    hurtBox:move( 100, 100 )
-
-    testCurve = love.math.newBezierCurve( 100, 100, 100, 620, 860, 620 )
+    ground = Hitbox:new( 1000, 50, "solid" )
+    testMap:addHitbox( ground )
+    ground:move( width/2, 600 )
 
     TestPlayer = Player:new( testMap )
-    TestPlayer:move( width/2, height/2 )
+    TestPlayer:move( width/2, 300 )
 
     -- collectgarbage( "stop" )
 end
@@ -52,12 +41,6 @@ end
 function love.update(dt)
     timer = timer + dt
     Debug:update( dt )
-
-    hurtBoxDistanceX, hurtBoxDistanceY = testCurve:evaluate( (timer % finishTime) / finishTime )
-    hurtBoxDistanceX = hurtBoxDistanceX - hurtBox.x
-    hurtBoxDistanceY = hurtBoxDistanceY - hurtBox.y
-
-    hurtBox:move( hurtBoxDistanceX, hurtBoxDistanceY )
 
     TestPlayer:update( dt )
 
@@ -70,11 +53,11 @@ end
 function love.draw()
     love.graphics.setColor( 0, 0, 0 )
 
+    love.graphics.line( 0, 575, width, 575 )
+
     if Debug.shown then
         for _, h in ipairs( testMap.colliders ) do h:draw() end
     end
-
-    love.graphics.line( testCurve:render() )
 
     TestPlayer:draw()
 
