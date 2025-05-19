@@ -29,7 +29,7 @@ function Map:new(id)
         colliders = {},
 
     -- Gravity Value
-        gravity = -9
+        gravity = 10
     }
 
     setmetatable( map, self )
