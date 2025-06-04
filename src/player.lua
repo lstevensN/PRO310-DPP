@@ -10,7 +10,7 @@ local PLAYER_COLLISION_WIDTH = 150
 local PLAYER_COLLISION_HEIGHT = 200
 
 local PLAYER_DEFAULT_SPEED = 250
-local PLAYER_DEFAULT_JUMP_HEIGHT = 300
+local PLAYER_DEFAULT_JUMP_FORCE = 400
 
 
 local function CreateBehaviorMapppings(player)
@@ -20,18 +20,21 @@ local function CreateBehaviorMapppings(player)
             if (not player.grounded) then
                 player.dy = player.map.gravity * 3
                 player.state = 'fall'
+            
             elseif (love.keyboard.isDown( 'a' )) then
                 player.direction = 'left'
                 player.dx = -player.speed
                 player.state = 'walk'
                 -- player.animations['walk']:restart()
                 -- player.animation = player.animations['walk']
+            
             elseif (love.keyboard.isDown( 'd' )) then
                 player.direction = 'right'
                 player.dx = player.speed
                 player.state = 'walk'
                 -- player.animations['walk']:restart()
                 -- player.animation = player.animations['walk']
+            
             else
                 player.dx = 0
             end
@@ -42,14 +45,21 @@ local function CreateBehaviorMapppings(player)
             if (not player.grounded) then
                 player.dy = player.map.gravity * 3
                 player.state = 'fall'
+
+                if (player.direction == 'left') then player.dx = -player.speed * 0.6
+                else player.dx = player.speed * 0.6 end
+            
             elseif (love.keyboard.isDown( 'lshift' )) then
                 player.state = 'run'
+            
             elseif (love.keyboard.isDown( 'a' )) then
                 player.direction = 'left'
                 player.dx = -player.speed
+            
             elseif (love.keyboard.isDown( 'd' )) then
                 player.direction = 'right'
                 player.dx = player.speed
+            
             else
                 player.dx = 0
                 player.state = 'idle'
@@ -62,14 +72,21 @@ local function CreateBehaviorMapppings(player)
             if (not player.grounded) then
                 player.dy = -player.jumpHeight
                 player.state = 'fall'
+
+                if (player.direction == 'left') then player.dx = -player.speed * 0.6
+                else player.dx = player.speed * 0.6 end
+            
             elseif (not love.keyboard.isDown( 'lshift' )) then
                 player.state = 'walk'
+            
             elseif (love.keyboard.isDown( 'a' )) then
                 player.direction = 'left'
                 player.dx = -player.speed * 2
+            
             elseif (love.keyboard.isDown( 'd' )) then
                 player.direction = 'right'
                 player.dx = player.speed * 2
+            
             else
                 player.dx = 0
                 player.state = 'idle'
@@ -82,18 +99,30 @@ local function CreateBehaviorMapppings(player)
             if (player.grounded) then
                 player.dy = 0
                 player.state = 'idle'
+            
             else
                 player.dy = player.dy + player.map.gravity
                 if (player.dy > 800) then player.dy = 800 end
             end
             
             if (player.direction == 'left' and player.dx < 0) then
-                player.dx = -player.speed * 0.6
+                player.dx = player.dx + dt
+            
             elseif (player.direction == 'right' and player.dx > 0) then
-                player.dx = player.speed * 0.6
+                player.dx = player.dx - dt
+            
             else
                 player.dx = 0
             end
+
+            if (player.rotation) then
+                
+            end
+        end,
+
+        -- DODGE Behavior
+        ['dodge'] = function (dt)
+            
         end,
 
         -- ATTACK Behavior
@@ -170,7 +199,7 @@ function Player:new(map)
         speed = PLAYER_DEFAULT_SPEED,
 
     -- Jump Height
-        jumpHeight = PLAYER_DEFAULT_JUMP_HEIGHT,
+        jumpHeight = PLAYER_DEFAULT_JUMP_FORCE,
 
     -- "Grounded" Status  (is Player on ground?)
         grounded = true,

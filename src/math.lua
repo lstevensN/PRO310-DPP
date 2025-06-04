@@ -80,3 +80,7 @@ function VectorNormalize(v)
         y = v.y / magnitude
     }
 end
+
+function Round(n)
+    return math.floor(n + 0.5)
+end
